@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.hcl.VirtualBookStore.model.Book;
 import com.hcl.VirtualBookStore.repo.BookRepository;
+import com.hcl.VirtualBookStore.utils.BookNotFoundException;
 
 import lombok.AllArgsConstructor;
 
@@ -32,6 +33,34 @@ public class BookService {
     public void deleteBook(Long id){
         bookRepository.deleteById(id);
     }
+
+
+    public Book updateBook(Long id,Book updatedBook){
+
+        Book foundBook = bookRepository.findById(id).orElseThrow(()->new BookNotFoundException("Book not found by Id "+ id));
+
+        foundBook.setTitle(updatedBook.getTitle());
+        foundBook.setAuthor(updatedBook.getAuthor());
+        foundBook.setDescription(updatedBook.getDescription());
+        foundBook.setPrice(updatedBook.getPrice());
+        foundBook.setCategory(updatedBook.getCategory());
+        foundBook.setStock(updatedBook.getStock());
+
+        return bookRepository.save(foundBook);
+
+    }
+
+
+    public List<Book> searchByTitle(String title){
+        return bookRepository.findByTitleContainingIgnoreCase(title);
+    }
+
+    public List<Book> getByCategory(String category){
+        return bookRepository.findByCategoryContainingIgnoreCase(category);
+    }
+
+
+
 
     public void loadData(){
 
