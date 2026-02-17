@@ -16,12 +16,21 @@ public class BookService {
     
     private final BookRepository bookRepository;
 
+    
+    public void saveBook(Book book){
+        bookRepository.save(book);
+    }
+    
+    public Book getBookById(Long id){
+        return bookRepository.findById(id).orElse(null);
+    }
+
     public List<Book> getBooks(){
         return  bookRepository.findAll();
     }
 
-    public void addBook(Book book){
-        bookRepository.save(book);
+    public void deleteBook(Long id){
+        bookRepository.deleteById(id);
     }
 
     public void loadData(){
@@ -83,4 +92,5 @@ public class BookService {
 
         bookRepository.saveAll(list);
     }
+
 }
