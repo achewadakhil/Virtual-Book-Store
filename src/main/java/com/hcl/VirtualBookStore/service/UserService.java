@@ -28,4 +28,9 @@ public class UserService {
 
         cartRepository.save(cart);
     }
+
+    public User getUser(Long user_id){
+        return userRepository.findById(user_id)
+        .orElseThrow(()->new RuntimeException("User not found"));
+    }
 }

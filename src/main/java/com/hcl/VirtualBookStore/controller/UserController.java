@@ -10,6 +10,10 @@ import lombok.AllArgsConstructor;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -25,6 +29,11 @@ public class UserController {
        
         userService.createUser(user);
         
+    }
+    
+    @GetMapping("/user/{user_id}")
+    public User getUserById(@PathVariable Long user_id) {
+        return userService.getUser(user_id);
     }
     
     

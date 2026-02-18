@@ -1,5 +1,7 @@
 package com.hcl.VirtualBookStore.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,7 +32,10 @@ public class User {
 
     // This tells one user has one cart 
     // Cart will be the owner table and User will be inverse so in cart user's id will be stored
+    // JsonManagedRefernce tells json to serialize the inner class normally 
+    // JsonBackedRefernce tells to stop
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Cart cart;
 
 

@@ -3,6 +3,9 @@ package com.hcl.VirtualBookStore.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,11 +33,13 @@ public class Cart {
 
     @OneToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     // One cart can store many cartItems (OnetoMany)
     // cartItems will be the owner table which will have cart_id in 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<CartItem> items = new ArrayList<>(); 
-    
+
 }
