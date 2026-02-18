@@ -19,10 +19,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
-
-
-
-
 @RestController
 @AllArgsConstructor
 @RequestMapping("/books")
@@ -55,8 +51,6 @@ public class BookController {
         return bookService.updateBook(id, book);
     }
     
-
-
     @GetMapping("/search")
     public List<Book> searchBooks(@RequestParam String title) {
         return bookService.searchByTitle(title);
