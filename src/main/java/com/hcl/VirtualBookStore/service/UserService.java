@@ -1,5 +1,7 @@
 package com.hcl.VirtualBookStore.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -32,5 +34,9 @@ public class UserService {
     public User getUser(Long user_id){
         return userRepository.findById(user_id)
         .orElseThrow(()->new RuntimeException("User not found"));
+    }
+
+    public List<User> getAll(){
+        return userRepository.findAll();
     }
 }
