@@ -56,4 +56,12 @@ public class CartService {
         cart.getItems().add(cartItem);
     }
 
+
+
+    public Cart getCart(Long user_id){
+        User foundUser = userRepository.findById(user_id)
+        .orElseThrow(()->new RuntimeException("No user found"));
+        if(foundUser != null)   return foundUser.getCart();
+        return null;
+    }
 }
