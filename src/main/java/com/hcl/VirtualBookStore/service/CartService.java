@@ -8,6 +8,7 @@ import com.hcl.VirtualBookStore.model.Cart;
 import com.hcl.VirtualBookStore.model.CartItem;
 import com.hcl.VirtualBookStore.model.User;
 import com.hcl.VirtualBookStore.repo.BookRepository;
+import com.hcl.VirtualBookStore.repo.CartRepository;
 import com.hcl.VirtualBookStore.repo.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -19,6 +20,7 @@ public class CartService {
 
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final CartRepository cartRepository;
 
     
     // transactional is used to directly work with DB's roll back and all are managed themselves
@@ -58,10 +60,27 @@ public class CartService {
 
 
 
-    public Cart getCart(Long user_id){
+    public Cart viewCart(Long user_id){
         User foundUser = userRepository.findById(user_id)
         .orElseThrow(()->new RuntimeException("No user found"));
         if(foundUser != null)   return foundUser.getCart();
         return null;
     }
+
+    @Transactional
+    public Cart removeFromCart(Long user_id,Long book_id){
+
+        User foundUser = userRepository.findById(user_id).
+                        orElseThrow(()-> new RuntimeException("User not found"));
+        Book foundBook = bookRepository.findById(book_id).
+                        orElseThrow(()-> new RuntimeException("Book not found"));
+
+        Cart cart = foundUser.getCart();
+        if(cart == null)    return null;
+
+        cart.getItems().removeIf(item -> item.getBook().getId().equals(book_id));
+        
+        return cart;
+    }
+
 }
