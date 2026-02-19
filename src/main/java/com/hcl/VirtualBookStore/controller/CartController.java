@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -44,4 +47,11 @@ public class CartController {
 
             return cartService.removeFromCart(user_id,book_id);
         }
+    
+
+    @PutMapping("/decrease/{user_id}/{book_id}")
+    public Cart decreaseOne(@PathVariable Long user_id, @PathVariable Long book_id) {
+        
+        return cartService.removeOne(user_id,book_id);
+    }
 }
