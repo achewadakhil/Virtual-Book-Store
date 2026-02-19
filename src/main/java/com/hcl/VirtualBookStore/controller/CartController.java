@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -54,4 +53,15 @@ public class CartController {
         
         return cartService.removeOne(user_id,book_id);
     }
+
+    @GetMapping("/{user_id}/total")
+    public double totalCost(@PathVariable Long user_id) {
+        return cartService.getTotal(user_id);
+    }
+    
+    @DeleteMapping("/clear/{userId}")
+    public void clearCart(@PathVariable Long userId) {
+    cartService.clearCart(userId);
+}
+
 }
