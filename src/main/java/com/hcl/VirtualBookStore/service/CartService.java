@@ -1,6 +1,8 @@
 package com.hcl.VirtualBookStore.service;
 
 
+import java.util.Iterator;
+
 import org.springframework.stereotype.Service;
 
 import com.hcl.VirtualBookStore.model.Book;
@@ -55,5 +57,92 @@ public class CartService {
 
         cart.getItems().add(cartItem);
     }
+
+
+
+    public Cart viewCart(Long user_id){
+        User foundUser = userRepository.findById(user_id)
+        .orElseThrow(()->new RuntimeException("No user found"));
+        if(foundUser != null)   return foundUser.getCart();
+        return null;
+    }
+
+    @Transactional
+    public Cart removeFromCart(Long user_id,Long book_id){
+
+        User foundUser = userRepository.findById(user_id).
+                        orElseThrow(()-> new RuntimeException("User not found"));
+
+        Cart cart = foundUser.getCart();
+        if(cart == null)    return null;
+
+        cart.getItems().removeIf(item -> item.getBook().getId().equals(book_id));
+        
+        return cart;
+    }
+
+
+    @Transactional
+    public Cart removeOne(Long user_id, Long book_id){
+
+        User foundUser = userRepository.findById(user_id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Cart cart = foundUser.getCart();
+        if (cart == null) {
+            throw new RuntimeException("Cart not found");
+        }
+
+        Iterator<CartItem> iterator = cart.getItems().iterator();
+
+        while (iterator.hasNext()) {
+            CartItem item = iterator.next();
+
+            if (item.getBook().getId().equals(book_id)) {
+
+                int newQuantity = item.getQuantity() - 1;
+
+                if (newQuantity <= 0) {
+                    iterator.remove();        // safe removal
+                } else {
+                    item.setQuantity(newQuantity);
+                }
+
+                break; // break AFTER finding match
+            }
+        }
+
+        return cart;
+    }
+
+    public double  getTotal(Long userId){
+
+        User foundUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Cart cart = foundUser.getCart();
+        if (cart == null) {
+            throw new RuntimeException("Cart not found");
+        }
+
+        double total = 0;
+        for(CartItem item : cart.getItems()){
+
+            total = total + item.getBook().getPrice() * item.getQuantity();
+        }
+        return total;
+    }
+
+    @Transactional
+    public void clearCart(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Cart cart = user.getCart();
+        cart.getItems().clear();
+
+    }
+
 
 }

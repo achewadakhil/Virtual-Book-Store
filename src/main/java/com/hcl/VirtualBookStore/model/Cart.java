@@ -38,7 +38,7 @@ public class Cart {
 
     // One cart can store many cartItems (OnetoMany)
     // cartItems will be the owner table which will have cart_id in 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonManagedReference
     private List<CartItem> items = new ArrayList<>(); 
 
