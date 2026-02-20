@@ -1,5 +1,7 @@
 package com.hcl.VirtualBookStore.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,12 +30,14 @@ public class OrderItem {
     //A book can be part of any orderItems
     @ManyToOne
     @JoinColumn(name = "book_id")
+    @JsonBackReference
     private Book book; 
 
 
     //one order has many items
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @JsonBackReference
     private Order order;
 
 }
