@@ -4,12 +4,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hcl.VirtualBookStore.model.Order;
 import com.hcl.VirtualBookStore.service.OrderService;
-
 import lombok.AllArgsConstructor;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
 
 
 @RestController
@@ -17,7 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @AllArgsConstructor
 public class OrderController {
 
+
     private final OrderService orderService;
+
+
+    
     
 
     @PostMapping("/checkout/{user_id}")
@@ -25,6 +32,11 @@ public class OrderController {
         //TODO: process POST request
         
         return orderService.checkout(user_id);
+    }
+    
+    @GetMapping("/{user_id}")
+    public List<Order> userOrders(@PathVariable Long user_id) {
+        return orderService.getOrders(user_id);
     }
     
 }

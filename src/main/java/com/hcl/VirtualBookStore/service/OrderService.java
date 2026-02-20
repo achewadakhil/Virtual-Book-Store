@@ -2,6 +2,7 @@ package com.hcl.VirtualBookStore.service;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -70,5 +71,10 @@ public class OrderService {
 
         cart.getItems().clear();
         return orderRepository.save(order);
+    }
+
+
+    public List<Order> getOrders(Long user_id){
+        return orderRepository.findByUserId(user_id);
     }
 }
