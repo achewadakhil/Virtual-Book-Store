@@ -35,7 +35,7 @@ public class CartItem {
     // One cart can have many cartItems
     @ManyToOne
     @JoinColumn(name = "cart_id")
-    @JsonBackReference
+    @JsonBackReference("cart-cartItems")
     private Cart cart;
 
 }

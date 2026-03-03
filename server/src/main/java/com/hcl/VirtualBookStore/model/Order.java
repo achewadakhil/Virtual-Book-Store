@@ -40,12 +40,12 @@ public class Order {
     //One user can have any no. of orders and they are linked by user_id
     @ManyToOne
     @JoinColumn( name = "user_id")
-    @JsonBackReference
+    @JsonBackReference("user-order")
     private User user;
 
     //Order will have list of items
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonManagedReference("order-orderItem")
     private List<OrderItem> items = new ArrayList<>();
 
 
