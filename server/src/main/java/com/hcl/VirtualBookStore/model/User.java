@@ -39,11 +39,11 @@ public class User {
     // JsonManagedRefernce tells json to serialize the inner class normally 
     // JsonBackedRefernce tells to stop
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonManagedReference("user-cart")
     private Cart cart;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonManagedReference("user-order")
     private List<Order> orders = new ArrayList<>();
 
 }

@@ -33,13 +33,13 @@ public class Cart {
 
     @OneToOne
     @JoinColumn(name = "user_id")
-    @JsonBackReference
+    @JsonBackReference("user-cart")
     private User user;
 
     // One cart can store many cartItems (OnetoMany)
     // cartItems will be the owner table which will have cart_id in 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL,orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference("cart-cartItem")
     private List<CartItem> items = new ArrayList<>(); 
 
 }
