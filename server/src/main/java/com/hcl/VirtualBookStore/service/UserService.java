@@ -21,7 +21,7 @@ public class UserService {
     private final CartRepository cartRepository;
 
 
-    public void createUser(@RequestBody User user) {
+    public User register(@RequestBody User user) {
 
         User savedUser = userRepository.save(user);
 
@@ -29,6 +29,7 @@ public class UserService {
         cart.setUser(savedUser);
 
         cartRepository.save(cart);
+        return savedUser;
     }
 
     public User getUser(Long user_id){

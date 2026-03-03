@@ -8,16 +8,10 @@ import com.hcl.VirtualBookStore.service.UserService;
 
 import lombok.AllArgsConstructor;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-
-
 
 
 @RestController
@@ -25,14 +19,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 @AllArgsConstructor
 public class UserController {
 
+
+
     private final UserService userService;
 
-
-    @PostMapping("/newUser")
-    public void createnewUser(@RequestBody User user) {
-       
-        userService.createUser(user);
-        
+    @GetMapping("/public")
+    public String publicRoute(){
+        return "Public";
     }
     
     @GetMapping("/user/{user_id}")
