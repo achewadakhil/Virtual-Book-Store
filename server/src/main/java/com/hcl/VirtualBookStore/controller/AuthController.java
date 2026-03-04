@@ -1,12 +1,10 @@
 package com.hcl.VirtualBookStore.controller;
 import com.hcl.VirtualBookStore.service.UserService;
-
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,15 +13,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hcl.VirtualBookStore.DTO.request.LoginRequest;
 import com.hcl.VirtualBookStore.model.User;
+import com.hcl.VirtualBookStore.security.JwtService;
 
 @RestController
 @RequestMapping("/auth")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthController {
 
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
 
     @PostMapping("/register")
@@ -64,12 +64,11 @@ public class AuthController {
             )
         );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         if(authentication.isAuthenticated()){
-            return "Login successfull";
+            return jwtService.generateToken(request.getEmail());
         }
-        return "Error logging in";
+        throw new RuntimeException("Invalid credentials");
     } 
 
 }

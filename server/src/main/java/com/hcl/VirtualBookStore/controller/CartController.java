@@ -24,12 +24,12 @@ public class CartController {
 
     private final CartService cartService;
 
-    @PostMapping("/addBook")
+    @PostMapping({"/addBook", "/newBook"})
     public void addToCart(@RequestParam Long user_id,
                             @RequestParam Long book_id,
                             @RequestParam int quantity
     ) {
-        
+        System.out.println("Hello");
         cartService.addToCart(user_id, book_id, quantity);
     }
     
