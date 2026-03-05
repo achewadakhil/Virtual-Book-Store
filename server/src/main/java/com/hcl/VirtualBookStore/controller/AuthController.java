@@ -66,7 +66,8 @@ public class AuthController {
 
 
         if(authentication.isAuthenticated()){
-            return jwtService.generateToken(request.getEmail());
+            User user = userService.getByEmail(request.getEmail());
+            return jwtService.generateToken(user);
         }
         throw new RuntimeException("Invalid credentials");
     } 

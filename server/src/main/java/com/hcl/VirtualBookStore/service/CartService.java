@@ -10,7 +10,6 @@ import com.hcl.VirtualBookStore.model.Cart;
 import com.hcl.VirtualBookStore.model.CartItem;
 import com.hcl.VirtualBookStore.model.User;
 import com.hcl.VirtualBookStore.repo.BookRepository;
-import com.hcl.VirtualBookStore.repo.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -19,17 +18,15 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CartService {
 
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
     private final BookRepository bookRepository;
 
     
     // transactional is used to directly work with DB's roll back and all are managed themselves
     
     @Transactional
-    public void addToCart(Long user_id, Long book_id, int quantity) {
-
-        User foundUser = userRepository.findById(user_id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public void addToCart(Long book_id, int quantity) {
+        User foundUser = currentUserService.getCurrentUser();
 
         Book foundBook = bookRepository.findById(book_id)
                 .orElseThrow(() -> new RuntimeException("Book not found"));
@@ -60,18 +57,14 @@ public class CartService {
 
 
 
-    public Cart viewCart(Long user_id){
-        User foundUser = userRepository.findById(user_id)
-        .orElseThrow(()->new RuntimeException("No user found"));
-        if(foundUser != null)   return foundUser.getCart();
-        return null;
+    public Cart viewCart(){
+        User foundUser = currentUserService.getCurrentUser();
+        return foundUser.getCart();
     }
 
     @Transactional
-    public Cart removeFromCart(Long user_id,Long book_id){
-
-        User foundUser = userRepository.findById(user_id).
-                        orElseThrow(()-> new RuntimeException("User not found"));
+    public Cart removeFromCart(Long book_id){
+        User foundUser = currentUserService.getCurrentUser();
 
         Cart cart = foundUser.getCart();
         if(cart == null)    return null;
@@ -83,10 +76,8 @@ public class CartService {
 
 
     @Transactional
-    public Cart removeOne(Long user_id, Long book_id){
-
-        User foundUser = userRepository.findById(user_id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public Cart removeOne(Long book_id){
+        User foundUser = currentUserService.getCurrentUser();
 
         Cart cart = foundUser.getCart();
         if (cart == null) {
@@ -115,10 +106,8 @@ public class CartService {
         return cart;
     }
 
-    public double  getTotal(Long userId){
-
-        User foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public double  getTotal(){
+        User foundUser = currentUserService.getCurrentUser();
 
         Cart cart = foundUser.getCart();
         if (cart == null) {
@@ -134,10 +123,8 @@ public class CartService {
     }
 
     @Transactional
-    public void clearCart(Long userId) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public void clearCart() {
+        User user = currentUserService.getCurrentUser();
 
         Cart cart = user.getCart();
         cart.getItems().clear();

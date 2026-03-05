@@ -13,7 +13,6 @@ import com.hcl.VirtualBookStore.model.Order;
 import com.hcl.VirtualBookStore.model.OrderItem;
 import com.hcl.VirtualBookStore.model.User;
 import com.hcl.VirtualBookStore.repo.OrderRepository;
-import com.hcl.VirtualBookStore.repo.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -22,15 +21,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class OrderService {
 
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
     private final OrderRepository orderRepository;
     
     @Transactional
-    public Order checkout(Long user_id){
+    public Order checkout(){
         //in this method we will be getting all the items from cart and adding them to orders
 
-        User foundUser = userRepository.findById(user_id)
-                        .orElseThrow(()->new RuntimeException("User not found"));
+        User foundUser = currentUserService.getCurrentUser();
 
         Cart cart = foundUser.getCart();
 
@@ -74,7 +72,8 @@ public class OrderService {
     }
 
 
-    public List<Order> getOrders(Long user_id){
-        return orderRepository.findByUserId(user_id);
+    public List<Order> getOrders(){
+        User foundUser = currentUserService.getCurrentUser();
+        return orderRepository.findByUserId(foundUser.getId());
     }
 }

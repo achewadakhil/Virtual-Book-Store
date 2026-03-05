@@ -3,6 +3,7 @@ package com.hcl.VirtualBookStore.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.hcl.VirtualBookStore.model.Cart;
 import com.hcl.VirtualBookStore.service.CartService;
@@ -20,48 +21,46 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RestController
 @RequestMapping("/cart")
 @AllArgsConstructor
+@PreAuthorize("hasAnyRole('USER','ADMIN')")
 public class CartController {
 
     private final CartService cartService;
 
-    @PostMapping({"/addBook", "/newBook"})
-    public void addToCart(@RequestParam Long user_id,
-                            @RequestParam Long book_id,
+    @PostMapping({"/addBook", "/newBook", "/items"})
+    public void addToCart(@RequestParam Long book_id,
                             @RequestParam int quantity
     ) {
-        System.out.println("Hello");
-        cartService.addToCart(user_id, book_id, quantity);
+        cartService.addToCart(book_id, quantity);
     }
     
 
-    @GetMapping("/{user_id}")
-    public Cart getCart(@PathVariable Long user_id) {
-        return cartService.viewCart(user_id);
+    @GetMapping
+    public Cart getCart() {
+        return cartService.viewCart();
     }
 
 
-    @DeleteMapping("remove/{user_id}/{book_id}")
-    public Cart removeFromCart(@PathVariable Long user_id,
-        @PathVariable Long book_id){
+    @DeleteMapping({"/remove/{book_id}", "/items/{book_id}"})
+    public Cart removeFromCart(@PathVariable Long book_id){
 
-            return cartService.removeFromCart(user_id,book_id);
+            return cartService.removeFromCart(book_id);
         }
     
 
-    @PutMapping("/decrease/{user_id}/{book_id}")
-    public Cart decreaseOne(@PathVariable Long user_id, @PathVariable Long book_id) {
+    @PutMapping({"/decrease/{book_id}", "/items/{book_id}/decrease"})
+    public Cart decreaseOne(@PathVariable Long book_id) {
         
-        return cartService.removeOne(user_id,book_id);
+        return cartService.removeOne(book_id);
     }
 
-    @GetMapping("/{user_id}/total")
-    public double totalCost(@PathVariable Long user_id) {
-        return cartService.getTotal(user_id);
+    @GetMapping("/total")
+    public double totalCost() {
+        return cartService.getTotal();
     }
     
-    @DeleteMapping("/clear/{userId}")
-    public void clearCart(@PathVariable Long userId) {
-    cartService.clearCart(userId);
-}
+    @DeleteMapping({"/clear", "/items"})
+    public void clearCart() {
+        cartService.clearCart();
+    }
 
 }
