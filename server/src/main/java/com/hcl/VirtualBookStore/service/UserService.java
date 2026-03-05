@@ -3,7 +3,6 @@ package com.hcl.VirtualBookStore.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.hcl.VirtualBookStore.model.Cart;
 import com.hcl.VirtualBookStore.model.User;
@@ -21,7 +20,7 @@ public class UserService {
     private final CartRepository cartRepository;
 
 
-    public User register(@RequestBody User user) {
+    public User register(User user) {
         user.setRole("USER");
 
         User savedUser = userRepository.save(user);
@@ -33,8 +32,8 @@ public class UserService {
         return savedUser;
     }
 
-    public User getUser(Long user_id){
-        return userRepository.findById(user_id)
+    public User getUser(Long userId){
+        return userRepository.findById(userId)
         .orElseThrow(()->new RuntimeException("User not found"));
     }
 
