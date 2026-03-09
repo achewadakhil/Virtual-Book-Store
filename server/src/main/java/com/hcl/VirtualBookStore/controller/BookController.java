@@ -2,11 +2,16 @@ package com.hcl.VirtualBookStore.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hcl.VirtualBookStore.DTO.request.BookRequest;
+import com.hcl.VirtualBookStore.DTO.response.ApiResponse;
 import com.hcl.VirtualBookStore.model.Book;
 import com.hcl.VirtualBookStore.service.BookService;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,46 +32,59 @@ public class BookController {
     private final BookService bookService;
 
     @PostMapping("/addBook")
-    public void addBook(@RequestBody Book book) {
-        bookService.saveBook(book);
+    public ResponseEntity<ApiResponse<Book>> addBook(@Valid @RequestBody BookRequest request) {
+        Book savedBook = bookService.saveBook(toBook(request));
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(ApiResponse.success("Book added successfully", savedBook));
     }
 
     @GetMapping("/{id}")
-    public Book getBook(@PathVariable Long id) {
-        return bookService.getBookById(id);
+    public ResponseEntity<ApiResponse<Book>> getBook(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success("Book fetched successfully", bookService.getBookById(id)));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteBook(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<Void>> deleteBook(@PathVariable Long id){
         bookService.deleteBook(id);
+        return ResponseEntity.ok(ApiResponse.success("Book deleted successfully"));
     }
 
     @GetMapping
-    public List<Book> getAllBook(){
-        return bookService.getBooks();
+    public ResponseEntity<ApiResponse<List<Book>>> getAllBook(){
+        return ResponseEntity.ok(ApiResponse.success("Books fetched successfully", bookService.getBooks()));
     }
 
     @PutMapping("/{id}")
-    public Book updateBook(@PathVariable Long id, @RequestBody Book book) {
-        return bookService.updateBook(id, book);
+    public ResponseEntity<ApiResponse<Book>> updateBook(@PathVariable Long bookId, @Valid @RequestBody BookRequest request) {
+        return ResponseEntity.ok(ApiResponse.success("Book updated successfully", bookService.updateBook(bookId, toBook(request))));
     }
     
     @GetMapping("/search")
-    public List<Book> searchBooks(@RequestParam String title) {
-        return bookService.searchByTitle(title);
+    public ResponseEntity<ApiResponse<List<Book>>> searchBooks(@RequestParam String title) {
+        return ResponseEntity.ok(ApiResponse.success("Books fetched successfully", bookService.searchByTitle(title)));
     }
     
 
     @GetMapping("/category")
-    public List<Book> getByCategory(@RequestParam String category) {
-        return bookService.getByCategory(category);
+    public ResponseEntity<ApiResponse<List<Book>>> getByCategory(@RequestParam String category) {
+        return ResponseEntity.ok(ApiResponse.success("Books fetched successfully", bookService.getByCategory(category)));
     }
     
     @PostMapping("/load")
-    public void load() {
+    public ResponseEntity<ApiResponse<Void>> load() {
         bookService.loadData();
+        return ResponseEntity.ok(ApiResponse.success("Sample books loaded successfully"));
     }
-    
-    
+
+    private Book toBook(BookRequest request) {
+        Book book = new Book();
+        book.setTitle(request.getTitle());
+        book.setAuthor(request.getAuthor());
+        book.setPrice(request.getPrice());
+        book.setCategory(request.getCategory());
+        book.setDescription(request.getDescription());
+        book.setStock(request.getStock());
+        return book;
+    }
 
 }

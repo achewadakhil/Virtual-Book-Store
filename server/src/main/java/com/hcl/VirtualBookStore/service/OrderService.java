@@ -6,6 +6,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.hcl.VirtualBookStore.exception.EmptyCartException;
+import com.hcl.VirtualBookStore.exception.InsufficientStockException;
+import com.hcl.VirtualBookStore.exception.ResourceNotFoundException;
 import com.hcl.VirtualBookStore.model.Book;
 import com.hcl.VirtualBookStore.model.Cart;
 import com.hcl.VirtualBookStore.model.CartItem;
@@ -32,7 +35,13 @@ public class OrderService {
 
         Cart cart = foundUser.getCart();
 
-        if(cart == null||cart.getItems().size() == 0)    return null;
+        if (cart == null) {
+            throw new ResourceNotFoundException("Cart not found for current user");
+        }
+
+        if (cart.getItems().isEmpty()) {
+            throw new EmptyCartException("Cart is empty. Add items before checkout");
+        }
 
         Order order = new Order();
         order.setOrderDate(LocalDateTime.now());
@@ -46,7 +55,7 @@ public class OrderService {
             Book book = item.getBook();
 
             if(book.getStock() < item.getQuantity()){
-                throw new RuntimeException("Stock not available "+book.getId());
+                throw new InsufficientStockException("Insufficient stock for book id " + book.getId());
             }
 
 

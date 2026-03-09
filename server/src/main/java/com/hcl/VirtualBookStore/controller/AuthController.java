@@ -1,4 +1,8 @@
 package com.hcl.VirtualBookStore.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import com.hcl.VirtualBookStore.service.UserService;
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hcl.VirtualBookStore.DTO.request.LoginRequest;
 import com.hcl.VirtualBookStore.DTO.request.RefreshTokenRequest;
 import com.hcl.VirtualBookStore.DTO.request.RegisterRequest;
+import com.hcl.VirtualBookStore.DTO.response.ApiResponse;
 import com.hcl.VirtualBookStore.DTO.response.AuthResponse;
+import com.hcl.VirtualBookStore.DTO.response.UserResponse;
 import com.hcl.VirtualBookStore.model.User;
 import com.hcl.VirtualBookStore.security.JwtService;
 
@@ -33,7 +39,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public User createnewUser(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> createnewUser(@Valid @RequestBody RegisterRequest request) {
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
@@ -41,30 +47,13 @@ public class AuthController {
        
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        return userService.register(user);        
+        User savedUser = userService.register(user);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("User registered successfully", toUserResponse(savedUser)));
     }
-
-
-
-        // Login Request
-        //     ↓
-        // AuthenticationManager
-        //     ↓
-        // DaoAuthenticationProvider
-        //     ↓
-        // CustomUserDetailsService
-        //     ↓
-        // UserRepository (DB)
-        //     ↓
-        // PasswordEncoder.matches()
-        //     ↓
-        // Authentication Success/Fail
-        //     ↓
-        // SecurityContextHolder
-
         
     @PostMapping("/login")
-    public AuthResponse loginUser(@Valid @RequestBody LoginRequest request){
+    public ResponseEntity<ApiResponse<AuthResponse>> loginUser(@Valid @RequestBody LoginRequest request){
         // System.out.println("hello");
 
         Authentication authentication = authenticationManager.authenticate(
@@ -77,19 +66,22 @@ public class AuthController {
 
         if(authentication.isAuthenticated()){
             User user = userService.getByEmail(request.getEmail());
-            return new AuthResponse(
+            AuthResponse authResponse = new AuthResponse(
                 jwtService.generateAccessToken(user),
                 jwtService.getAccessTokenExpirationMs(),
                 jwtService.generateRefreshToken(user),
                 jwtService.getRefreshTokenExpirationMs(),
                 "Bearer"
             );
+
+            return ResponseEntity.ok(ApiResponse.success("Login successful", authResponse));
         }
-        throw new RuntimeException("Invalid credentials");
+        throw new BadCredentialsException("Invalid credentials");
     }
 
     @PostMapping("/refresh")
-    public AuthResponse refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        // System.out.println("hello");
         String refreshToken = request.getRefreshToken();
         String email = jwtService.extractUsername(refreshToken);
         User user = userService.getByEmail(email);
@@ -98,12 +90,23 @@ public class AuthController {
             throw new BadCredentialsException("Invalid refresh token");
         }
 
-        return new AuthResponse(
+        AuthResponse authResponse = new AuthResponse(
                 jwtService.generateAccessToken(user),
                 jwtService.getAccessTokenExpirationMs(),
                 jwtService.generateRefreshToken(user),
                 jwtService.getRefreshTokenExpirationMs(),
                 "Bearer"
+        );
+
+        return ResponseEntity.ok(ApiResponse.success("Token refreshed successfully", authResponse));
+    }
+
+    private UserResponse toUserResponse(User user) {
+        return new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole()
         );
     }
 

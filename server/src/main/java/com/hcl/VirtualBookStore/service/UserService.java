@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.hcl.VirtualBookStore.exception.ResourceNotFoundException;
 import com.hcl.VirtualBookStore.model.Cart;
 import com.hcl.VirtualBookStore.model.User;
 import com.hcl.VirtualBookStore.repo.CartRepository;
@@ -34,7 +35,7 @@ public class UserService {
 
     public User getUser(Long userId){
         return userRepository.findById(userId)
-        .orElseThrow(()->new RuntimeException("User not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found by id " + userId));
     }
 
     public List<User> getAll(){
@@ -43,6 +44,6 @@ public class UserService {
 
     public User getByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found by email " + email));
     }
 }

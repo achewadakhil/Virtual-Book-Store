@@ -5,9 +5,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.hcl.VirtualBookStore.exception.InvalidRequestException;
+import com.hcl.VirtualBookStore.exception.ResourceNotFoundException;
 import com.hcl.VirtualBookStore.model.Book;
 import com.hcl.VirtualBookStore.repo.BookRepository;
-import com.hcl.VirtualBookStore.utils.BookNotFoundException;
 
 import lombok.AllArgsConstructor;
 
@@ -18,12 +19,13 @@ public class BookService {
     private final BookRepository bookRepository;
 
     
-    public void saveBook(Book book){
-        bookRepository.save(book);
+    public Book saveBook(Book book){
+        return bookRepository.save(book);
     }
     
     public Book getBookById(Long id){
-        return bookRepository.findById(id).orElse(null);
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found by id " + id));
     }
 
     public List<Book> getBooks(){
@@ -31,13 +33,14 @@ public class BookService {
     }
 
     public void deleteBook(Long id){
-        bookRepository.deleteById(id);
+        Book foundBook = getBookById(id);
+        bookRepository.delete(foundBook);
     }
 
 
     public Book updateBook(Long id,Book updatedBook){
 
-        Book foundBook = bookRepository.findById(id).orElseThrow(()->new BookNotFoundException("Book not found by Id "+ id));
+        Book foundBook = getBookById(id);
 
         foundBook.setTitle(updatedBook.getTitle());
         foundBook.setAuthor(updatedBook.getAuthor());
@@ -52,10 +55,16 @@ public class BookService {
 
 
     public List<Book> searchByTitle(String title){
+        if (title == null || title.isBlank()) {
+            throw new InvalidRequestException("Title query must not be empty");
+        }
         return bookRepository.findByTitleContainingIgnoreCase(title);
     }
 
     public List<Book> getByCategory(String category){
+        if (category == null || category.isBlank()) {
+            throw new InvalidRequestException("Category query must not be empty");
+        }
         return bookRepository.findByCategoryContainingIgnoreCase(category);
     }
 
