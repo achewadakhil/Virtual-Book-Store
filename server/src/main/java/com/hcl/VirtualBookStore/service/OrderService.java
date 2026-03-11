@@ -6,6 +6,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.hcl.VirtualBookStore.exception.EmptyCartException;
+import com.hcl.VirtualBookStore.exception.InsufficientStockException;
+import com.hcl.VirtualBookStore.exception.ResourceNotFoundException;
 import com.hcl.VirtualBookStore.model.Book;
 import com.hcl.VirtualBookStore.model.Cart;
 import com.hcl.VirtualBookStore.model.CartItem;
@@ -13,7 +16,6 @@ import com.hcl.VirtualBookStore.model.Order;
 import com.hcl.VirtualBookStore.model.OrderItem;
 import com.hcl.VirtualBookStore.model.User;
 import com.hcl.VirtualBookStore.repo.OrderRepository;
-import com.hcl.VirtualBookStore.repo.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -22,19 +24,24 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class OrderService {
 
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
     private final OrderRepository orderRepository;
     
     @Transactional
-    public Order checkout(Long user_id){
+    public Order checkout(){
         //in this method we will be getting all the items from cart and adding them to orders
 
-        User foundUser = userRepository.findById(user_id)
-                        .orElseThrow(()->new RuntimeException("User not found"));
+        User foundUser = currentUserService.getCurrentUser();
 
         Cart cart = foundUser.getCart();
 
-        if(cart == null||cart.getItems().size() == 0)    return null;
+        if (cart == null) {
+            throw new ResourceNotFoundException("Cart not found for current user");
+        }
+
+        if (cart.getItems().isEmpty()) {
+            throw new EmptyCartException("Cart is empty. Add items before checkout");
+        }
 
         Order order = new Order();
         order.setOrderDate(LocalDateTime.now());
@@ -48,7 +55,7 @@ public class OrderService {
             Book book = item.getBook();
 
             if(book.getStock() < item.getQuantity()){
-                throw new RuntimeException("Stock not available "+book.getId());
+                throw new InsufficientStockException("Insufficient stock for book id " + book.getId());
             }
 
 
@@ -74,7 +81,8 @@ public class OrderService {
     }
 
 
-    public List<Order> getOrders(Long user_id){
-        return orderRepository.findByUserId(user_id);
+    public List<Order> getOrders(){
+        User foundUser = currentUserService.getCurrentUser();
+        return orderRepository.findByUserId(foundUser.getId());
     }
 }
